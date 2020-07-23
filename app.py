@@ -7,7 +7,7 @@ import requests
 import operator
 import re
 import nltk
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, url_for
 from flask_sqlalchemy import SQLAlchemy
 from stop_words import stops
 from collections import Counter
@@ -24,7 +24,9 @@ db = SQLAlchemy(app)
 
 q = Queue(connection=conn)
 
+# pylint: disable=wrong-import-position
 from models import Result
+
 
 def count_and_save_words(url):
     """Count the times a word shows up and save them."""
@@ -107,6 +109,9 @@ def get_results(job_key):
     else:
         return "Your results are not ready yet!", 202
 
+
+app.add_url_rule('/favicon.ico',
+                 redirect_to=url_for('static', filename='favicon.ico'))
 
 if __name__ == "__main__":
     app.run()
