@@ -1,6 +1,7 @@
 """The main application."""
 
 
+import json
 import os
 import requests
 import operator
@@ -25,7 +26,6 @@ q = Queue(connection=conn)
 
 from models import Result
 
-
 def count_and_save_words(url):
     """Count the times a word shows up and save them."""
     errors = []
@@ -36,7 +36,7 @@ def count_and_save_words(url):
             'Unable to get URL. Please make sure it is valid and try again.'
         )
         return {"error": errors}
-    
+
     raw = BeautifulSoup(r.text).get_text()
     nltk.data.path.append('./nltk_data/')  # set the path
     tokens = nltk.word_tokenize(raw)
@@ -65,23 +65,30 @@ def count_and_save_words(url):
         errors.append('Unable to add item to database.')
         return {"error": errors}
 
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     """Get words from a URL."""
-    results = {}
-    if request.method == 'POST':
-        # solves an rq bug
-        from app import count_and_save_words
+    return render_template('index.html')
 
-        # get url that the person has entered
-        url = request.form['url']
-        if not url[:8].startswith(('https://', 'http://')):
-            url = 'http://{}'.format(url)
-        job = q.enqueue_call(
-            func=count_and_save_words, args=(url,), result_ttl=5000
-        )
-        print(job.get_id)
-    return render_template('index.html', results=results)
+
+@app.route('/start', methods=['POST'])
+def get_counts():
+    """Get the counts."""
+    # this import solves a rq bug which currently exists
+    from app import count_and_save_words
+
+    # get url
+    data = json.loads(request.data.decode())
+    url = data["url"]
+    if not url[:8].startswith(('https://', 'http://')):
+        url = 'http://' + url
+    # start job
+    job = q.enqueue_call(
+        func=count_and_save_words, args=(url,), result_ttl=5000
+    )
+    # return created job id
+    return job.get_id()
 
 
 @app.route('/results/<job_key>', methods=['GET'])
