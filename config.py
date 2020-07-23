@@ -15,6 +15,7 @@ class Config():
     SECRET_KEY = os.environ.get('SECRET_KEY', 'sdjf;lajdsflkjdsf;ljsda'
                                 'flkjsdaf;l ljfoiwej8r2-4578qewupocmv?Z'
                                 'n/lkhoqytr9807509')
+    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
 
 class ProductionConfig(Config):
