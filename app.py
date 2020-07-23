@@ -24,7 +24,6 @@ db = SQLAlchemy(app)
 
 q = Queue(connection=conn)
 
-# pylint: disable=wrong-import-position
 from models import Result
 
 
@@ -109,9 +108,6 @@ def get_results(job_key):
     else:
         return "Your results are not ready yet!", 202
 
-
-app.add_url_rule('/favicon.ico',
-                 redirect_to=url_for('static', filename='favicon.ico'))
 
 if __name__ == "__main__":
     app.run()
