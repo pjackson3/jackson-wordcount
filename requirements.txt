@@ -5,3 +5,4 @@ Flask-SQLAlchemy==2.4.1
 PyMySQL==0.10.0
 Flask-Script==2.0.6
 Flask-DotEnv==0.1.2
+psycopg2
